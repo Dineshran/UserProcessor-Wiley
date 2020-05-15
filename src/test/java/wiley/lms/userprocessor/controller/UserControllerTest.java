@@ -20,6 +20,7 @@ import wiley.lms.userprocessor.model.dto.UserDto;
 import wiley.lms.userprocessor.model.entity.Role;
 import wiley.lms.userprocessor.model.entity.User;
 import wiley.lms.userprocessor.model.exception.ErrorDetails;
+import wiley.lms.userprocessor.model.exception.InvalidParametersException;
 import wiley.lms.userprocessor.model.exception.NoUsersException;
 import wiley.lms.userprocessor.model.exception.UserNotFoundException;
 import wiley.lms.userprocessor.service.UserService;
@@ -33,6 +34,26 @@ import static org.mockito.ArgumentMatchers.anyLong;
 
 @ExtendWith(SpringExtension.class)
 public class UserControllerTest {
+
+    private String SEPERATOR = "/";
+
+    private String BASEURL = SEPERATOR + "users";
+    
+    private String BASEURLERROR = "uri="+ BASEURL;
+
+    private String USERID = "1";
+
+    private Role ROLE = Role.ADMIN;
+
+    private String ROLEURL = BASEURL + SEPERATOR + "role";
+
+    private String ACTIVEURL = BASEURL + SEPERATOR + "active";
+
+    private String ROLEERRORURL = BASEURLERROR + SEPERATOR + "role";
+
+    private String ACTIVEERRORURL = BASEURLERROR + SEPERATOR + "active";
+
+    private Boolean BOOL = true;
 
     @Mock
     UserService userServiceMock;
@@ -57,7 +78,8 @@ public class UserControllerTest {
      */
     @Test
     void testConnection() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/test"))
+        String url = BASEURL + "/test";
+        mockMvc.perform(MockMvcRequestBuilders.get(url))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Connection Success"));
     }
@@ -73,7 +95,7 @@ public class UserControllerTest {
 
         List<User> expectedUser = UserBuilder.buildUserList();
         Mockito.when(userServiceMock.getAllUsers()).thenReturn(expectedUser);
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/users"))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(BASEURL))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
         List<User> actualResult = Arrays.asList(TestUtil.mapFromJson(mvcResult.getResponse().getContentAsString(), User[].class));
@@ -96,9 +118,9 @@ public class UserControllerTest {
 
         ErrorDetails expectedErrorDetails = new ErrorDetails();
         expectedErrorDetails.setMessage(noUsersException.getMessage());
-        expectedErrorDetails.setDetails("uri=/users");
+        expectedErrorDetails.setDetails(BASEURLERROR);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/users"))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(BASEURL))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andReturn();
 
@@ -120,7 +142,7 @@ public class UserControllerTest {
         User expectedUser = UserBuilder.getUserFromDto(userDto);
         Mockito.when(userServiceMock.saveUser(any(UserDto.class))).thenReturn(expectedUser);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(BASEURL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtil.mapToJson(userDto))
                 .accept(MediaType.APPLICATION_JSON))
@@ -140,9 +162,10 @@ public class UserControllerTest {
     @Test
     void getUser() throws Exception {
 
+        String url = BASEURL + SEPERATOR + USERID;
         User expectedUser = UserBuilder.build();
         Mockito.when(userServiceMock.getUserById(anyLong())).thenReturn(expectedUser);
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/users/1"))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(url))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
         User actualUser = TestUtil.mapFromJson(mvcResult.getResponse().getContentAsString(), User.class);
@@ -158,20 +181,48 @@ public class UserControllerTest {
     @Test
     void getUserNotFound() throws Exception {
 
-        UserNotFoundException userNotFoundException = new UserNotFoundException("User Not Found for given Id: 1");
+        String appendUrl = SEPERATOR + USERID;
+        String url = BASEURL + appendUrl;
+        String errorUrl = BASEURLERROR + appendUrl;
+
+        UserNotFoundException userNotFoundException = new UserNotFoundException("User Not Found for given Id: " + USERID);
         Mockito.when(userServiceMock.getUserById(anyLong())).thenThrow(userNotFoundException);
 
         ErrorDetails expectedErrorDetails = new ErrorDetails();
         expectedErrorDetails.setMessage(userNotFoundException.getMessage());
-        expectedErrorDetails.setDetails("uri=/users/1");
+        expectedErrorDetails.setDetails(errorUrl);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/users/1"))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(url))
                 .andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 
         ErrorDetails actualErrorDetails = TestUtil.mapFromJson(mvcResult.getResponse().getContentAsString(), ErrorDetails.class);
 
         exceptionAssert(expectedErrorDetails, actualErrorDetails);
     }
+
+    @Test
+    void getUserInvalidLongId() throws Exception {
+
+        String appendUrl = SEPERATOR + "hf";
+        String url = BASEURL + appendUrl;
+        String errorUrl = BASEURLERROR + appendUrl;
+
+        InvalidParametersException invalidParametersException = new InvalidParametersException("must be a long value : hf");
+        Mockito.when(userServiceMock.getUserById(anyLong())).thenThrow(invalidParametersException);
+
+        ErrorDetails expectedErrorDetails = new ErrorDetails();
+        expectedErrorDetails.setMessage(invalidParametersException.getMessage());
+        expectedErrorDetails.setDetails(errorUrl);
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(url))
+                .andExpect(MockMvcResultMatchers.status().isNotAcceptable()).andReturn();
+
+        ErrorDetails actualErrorDetails = TestUtil.mapFromJson(mvcResult.getResponse().getContentAsString(), ErrorDetails.class);
+
+        exceptionAssert(expectedErrorDetails, actualErrorDetails);
+
+    }
+
 
     /**
      * test method for updateUser
@@ -182,11 +233,14 @@ public class UserControllerTest {
     @Test
     void updateUser() throws Exception {
 
+        String appendUrl = SEPERATOR + USERID;
+        String url = BASEURL + appendUrl;
+
         UserDto userDto = UserBuilder.getUserDto();
         User expectedUser = UserBuilder.getUserFromDto(userDto);
 
         Mockito.when(userServiceMock.updateUser(anyLong(), any(UserDto.class))).thenReturn(expectedUser);
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtil.mapToJson(userDto))
                 .accept(MediaType.APPLICATION_JSON))
@@ -206,15 +260,19 @@ public class UserControllerTest {
     @Test
     void updateUserNotFound() throws Exception {
 
+        String appendUrl = SEPERATOR + USERID;
+        String url = BASEURL + appendUrl;
+        String errorUrl = BASEURLERROR + appendUrl;
+
         UserDto userDto = UserBuilder.getUserDto();
-        UserNotFoundException userNotFoundException = new UserNotFoundException("User Not Found for given Id: 1");
+        UserNotFoundException userNotFoundException = new UserNotFoundException("User Not Found for given Id: " + USERID);
         Mockito.when(userServiceMock.updateUser(anyLong(), any(UserDto.class))).thenThrow(userNotFoundException);
 
         ErrorDetails expectedErrorDetails = new ErrorDetails();
         expectedErrorDetails.setMessage(userNotFoundException.getMessage());
-        expectedErrorDetails.setDetails("uri=/users/1");
+        expectedErrorDetails.setDetails(errorUrl);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtil.mapToJson(userDto))
                 .accept(MediaType.APPLICATION_JSON))
@@ -234,12 +292,16 @@ public class UserControllerTest {
      */
     @Test
     void deleteUser() throws Exception {
+
+        String appendUrl = SEPERATOR + USERID;
+        String url = BASEURL + appendUrl;
+
         Mockito.doNothing().when(userServiceMock).deleteUserById(anyLong());
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete("/users/1")
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("User Deleted Successfully : 1"))
+                .andExpect(MockMvcResultMatchers.content().string("User Deleted Successfully : "+USERID))
                 .andReturn();
     }
 
@@ -251,14 +313,19 @@ public class UserControllerTest {
      */
     @Test
     void deleteUserNotFound() throws Exception {
-        UserNotFoundException userNotFoundException = new UserNotFoundException("User Not Found for given Id: 1");
+
+        String appendUrl = SEPERATOR + USERID;
+        String url = BASEURL + appendUrl;
+        String errorUrl = BASEURLERROR + appendUrl;
+
+        UserNotFoundException userNotFoundException = new UserNotFoundException("User Not Found for given Id: "+ USERID);
         Mockito.doThrow(userNotFoundException).when(userServiceMock).deleteUserById(anyLong());
 
         ErrorDetails expectedErrorDetails = new ErrorDetails();
         expectedErrorDetails.setMessage(userNotFoundException.getMessage());
-        expectedErrorDetails.setDetails("uri=/users/1");
+        expectedErrorDetails.setDetails(errorUrl);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete("/users/1")
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
@@ -277,9 +344,13 @@ public class UserControllerTest {
      */
     @Test
     void getAllActiveUsers() throws Exception {
+
+        String appendUrl = SEPERATOR + BOOL;
+        String url = ACTIVEURL + appendUrl;
+
         List<User> expectedUser = UserBuilder.getActiveUser(true);
         Mockito.when(userServiceMock.getActiveUsers(Mockito.anyBoolean())).thenReturn(expectedUser);
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/users/active/true"))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(url))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
         List<User> actualResult = Arrays.asList(TestUtil.mapFromJson(mvcResult.getResponse().getContentAsString(), User[].class));
@@ -298,14 +369,18 @@ public class UserControllerTest {
     @Test
     void getAllActiveUsersNotFound() throws Exception {
 
+        String appendUrl = SEPERATOR + BOOL;
+        String url = ACTIVEURL + appendUrl;
+        String errorUrl = ACTIVEERRORURL + appendUrl;
+
         NoUsersException noUsersException = new NoUsersException("no users found in system");
 
         ErrorDetails expectedErrorDetails = new ErrorDetails();
         expectedErrorDetails.setMessage(noUsersException.getMessage());
-        expectedErrorDetails.setDetails("uri=/users/active/true");
+        expectedErrorDetails.setDetails(errorUrl);
 
         Mockito.when(userServiceMock.getActiveUsers(Mockito.anyBoolean())).thenThrow(noUsersException);
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/users/active/true"))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(url))
                 .andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 
         ErrorDetails actualErrorDetails = TestUtil.mapFromJson(mvcResult.getResponse().getContentAsString(), ErrorDetails.class);
@@ -320,15 +395,19 @@ public class UserControllerTest {
      */
     @Test
     void getAllUsersByRole() throws Exception {
-        List<User> expectedUser = UserBuilder.getRoleUser(Role.ADMIN);
+
+        String appendUrl = SEPERATOR + ROLE;
+        String url = ROLEURL + appendUrl;
+
+        List<User> expectedUser = UserBuilder.getRoleUser(ROLE);
         Mockito.when(userServiceMock.getUsersByRole(any(Role.class))).thenReturn(expectedUser);
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/users/role/ADMIN"))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(url))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
         List<User> actualResult = Arrays.asList(TestUtil.mapFromJson(mvcResult.getResponse().getContentAsString(), User[].class));
         for (int i = 0; i < expectedUser.size(); i++) {
             userAssert(expectedUser.get(i), actualResult.get(i));
-            Assertions.assertEquals(actualResult.get(i).getRole(), Role.ADMIN);
+            Assertions.assertEquals(actualResult.get(i).getRole(), ROLE);
         }
     }
 
@@ -340,14 +419,19 @@ public class UserControllerTest {
      */
     @Test
     void getAllUsersByRoleNotFound() throws Exception {
+
+        String appendUrl = SEPERATOR + ROLE;
+        String url = ROLEURL + appendUrl;
+        String errorUrl = ROLEERRORURL + appendUrl;
+
         NoUsersException noUsersException = new NoUsersException("no users found in system");
 
         ErrorDetails expectedErrorDetails = new ErrorDetails();
         expectedErrorDetails.setMessage(noUsersException.getMessage());
-        expectedErrorDetails.setDetails("uri=/users/role/ADMIN");
+        expectedErrorDetails.setDetails(errorUrl);
 
         Mockito.when(userServiceMock.getUsersByRole(any(Role.class))).thenThrow(noUsersException);
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/users/role/ADMIN"))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(url))
                 .andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 
         ErrorDetails actualErrorDetails = TestUtil.mapFromJson(mvcResult.getResponse().getContentAsString(), ErrorDetails.class);
