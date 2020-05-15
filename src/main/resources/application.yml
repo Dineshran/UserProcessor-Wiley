@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/userdb?autoReconnect=true&useSSL=false
+    username: userprocessor
+    password: Wiley@123
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  devtools:
+    livereload:
+      enabled: true
+logging:
+  level:
+    wiley.userprocessor: debug
