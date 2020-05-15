@@ -1,13 +1,11 @@
 package wiley.lms.userprocessor.controller;
 
-import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import wiley.lms.userprocessor.model.dto.UserDto;
 import wiley.lms.userprocessor.model.entity.Role;
 import wiley.lms.userprocessor.model.entity.User;
@@ -21,10 +19,9 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
+    Logger logger = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private UserService userService;
-
-    Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/test")
     public ResponseEntity<String> testConnection() {
@@ -79,7 +76,7 @@ public class UserController {
     public ResponseEntity<List<User>> getAllUsersByRole(@PathVariable("role") Role role) {
         logger.debug(MessageFormat.format("Successfully Entered getAllUsersByRole Method with Role : {0}", role.name()));
         List<User> users = userService.getUsersByRole(role);
-        return  new ResponseEntity<>(users, HttpStatus.OK);
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
 

@@ -35,34 +35,21 @@ import static org.mockito.ArgumentMatchers.anyLong;
 @ExtendWith(SpringExtension.class)
 public class UserControllerTest {
 
-    private String SEPERATOR = "/";
-
-    private String BASEURL = SEPERATOR + "users";
-    
-    private String BASEURLERROR = "uri="+ BASEURL;
-
-    private String USERID = "1";
-
-    private Role ROLE = Role.ADMIN;
-
-    private String ROLEURL = BASEURL + SEPERATOR + "role";
-
-    private String ACTIVEURL = BASEURL + SEPERATOR + "active";
-
-    private String ROLEERRORURL = BASEURLERROR + SEPERATOR + "role";
-
-    private String ACTIVEERRORURL = BASEURLERROR + SEPERATOR + "active";
-
-    private Boolean BOOL = true;
-
     @Mock
     UserService userServiceMock;
-
     @InjectMocks
     UserController controller;
-
     MockMvc mockMvc;
-
+    private String SEPERATOR = "/";
+    private String BASEURL = SEPERATOR + "users";
+    private String BASEURLERROR = "uri=" + BASEURL;
+    private String USERID = "1";
+    private Role ROLE = Role.ADMIN;
+    private String ROLEURL = BASEURL + SEPERATOR + "role";
+    private String ACTIVEURL = BASEURL + SEPERATOR + "active";
+    private String ROLEERRORURL = BASEURLERROR + SEPERATOR + "role";
+    private String ACTIVEERRORURL = BASEURLERROR + SEPERATOR + "active";
+    private Boolean BOOL = true;
     private ArrayList<User> list = new ArrayList<>();
 
     @BeforeEach
@@ -301,7 +288,7 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("User Deleted Successfully : "+USERID))
+                .andExpect(MockMvcResultMatchers.content().string("User Deleted Successfully : " + USERID))
                 .andReturn();
     }
 
@@ -318,7 +305,7 @@ public class UserControllerTest {
         String url = BASEURL + appendUrl;
         String errorUrl = BASEURLERROR + appendUrl;
 
-        UserNotFoundException userNotFoundException = new UserNotFoundException("User Not Found for given Id: "+ USERID);
+        UserNotFoundException userNotFoundException = new UserNotFoundException("User Not Found for given Id: " + USERID);
         Mockito.doThrow(userNotFoundException).when(userServiceMock).deleteUserById(anyLong());
 
         ErrorDetails expectedErrorDetails = new ErrorDetails();

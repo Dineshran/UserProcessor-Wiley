@@ -12,14 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import wiley.lms.userprocessor.controller.UserController;
 import wiley.lms.userprocessor.model.exception.*;
 
 import java.util.Date;
 
 @RestControllerAdvice
 @RestController
-public class UserExceptionController  extends ResponseEntityExceptionHandler {
+public class UserExceptionController extends ResponseEntityExceptionHandler {
 
     Logger logger = LoggerFactory.getLogger(UserExceptionController.class);
 

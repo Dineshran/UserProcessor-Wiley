@@ -16,14 +16,14 @@ public enum Role {
         this.code = code;
     }
 
-    public String getCode() {
-        return code;
-    }
-
     public static Role of(String code) {
         return Stream.of(Role.values())
                 .filter(p -> p.getCode().equals(code))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
+    }
+
+    public String getCode() {
+        return code;
     }
 }

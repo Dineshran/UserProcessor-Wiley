@@ -19,10 +19,9 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
 
+    Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
     private UserRepository userRepository;
-
-    Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     /**
      * no parameter needed
@@ -95,9 +94,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void deleteUserById(Long userId) {
-        logger.debug(MessageFormat.format("Entered Method deleteUserById with userId : {0}" , userId));
+        logger.debug(MessageFormat.format("Entered Method deleteUserById with userId : {0}", userId));
         userRepository.deleteById(userId);
-        logger.info(MessageFormat.format("User with userId : {0} deleted successfully" , userId));
+        logger.info(MessageFormat.format("User with userId : {0} deleted successfully", userId));
     }
 
     /**
@@ -120,7 +119,7 @@ public class UserServiceImpl implements UserService {
         user.setTermsOfServiceAccepted(userDto.isTermsOfServiceAccepted());
         user.setCreatedDate(new Date());
         userRepository.save(user);
-        logger.info(MessageFormat.format("User {0} Saved successfully with userId : {1}" , userDto.getFirstName() , user.getUserId()));
+        logger.info(MessageFormat.format("User {0} Saved successfully with userId : {1}", userDto.getFirstName(), user.getUserId()));
         return user;
     }
 
@@ -133,7 +132,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User updateUser(long userId, UserDto userDto) {
-        logger.debug(MessageFormat.format("Entered Method updateUser with userId : {0}" , userId));
+        logger.debug(MessageFormat.format("Entered Method updateUser with userId : {0}", userId));
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found for given Id : " + userId));
         user.setLtiUserId(userDto.getLtiUserId());
         user.setFirstName(userDto.getFirstName());

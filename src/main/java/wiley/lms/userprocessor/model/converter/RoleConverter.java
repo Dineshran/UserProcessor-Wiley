@@ -6,7 +6,7 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
 @Converter(autoApply = true)
-public class RoleConverter implements AttributeConverter<Role , String> {
+public class RoleConverter implements AttributeConverter<Role, String> {
     /**
      * Converts the value stored in the entity attribute into the
      * data representation to be stored in the database.
@@ -29,7 +29,7 @@ public class RoleConverter implements AttributeConverter<Role , String> {
      * not expected to do such type conversion.
      *
      * @param code the data from the database column to be
-     *               converted
+     *             converted
      * @return the converted value to be stored in the entity
      * attribute
      */

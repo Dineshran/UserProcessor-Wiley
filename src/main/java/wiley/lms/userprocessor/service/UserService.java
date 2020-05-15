@@ -10,12 +10,14 @@ public interface UserService {
 
     /**
      * no parameter needed
+     *
      * @return List of Users
      */
     public List<User> getAllUsers();
 
     /**
      * fetch the user by userid
+     *
      * @param userId
      * @return User
      */
@@ -23,13 +25,15 @@ public interface UserService {
 
     /**
      * return all the users of the specific consumerKey
+     *
      * @param role
      * @return List of Users
      */
-    public List<User> getUsersByRole(Role role) ;
+    public List<User> getUsersByRole(Role role);
 
     /**
      * return all the users of the specific consumerKey
+     *
      * @param active
      * @return List of Users
      */
@@ -37,6 +41,7 @@ public interface UserService {
 
     /**
      * delete User by Id
+     *
      * @param userId
      */
     public void deleteUserById(Long userId);
@@ -44,6 +49,7 @@ public interface UserService {
     /**
      * save the user with information from
      * userDto
+     *
      * @param userDto
      * @return User
      */
@@ -52,6 +58,7 @@ public interface UserService {
     /**
      * update the user with information from
      * userDto
+     *
      * @param userDto
      * @param id
      * @return updated User

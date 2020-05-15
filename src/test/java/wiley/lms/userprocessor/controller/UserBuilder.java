@@ -27,19 +27,19 @@ public class UserBuilder {
         return user;
     }
 
-    public static List<User> buildUserList(){
+    public static List<User> buildUserList() {
         Random random = new Random();
         List<User> users = new ArrayList<>();
-        for(int i=0; i<10 ; i++){
+        for (int i = 0; i < 10; i++) {
             User user = new User();
-            user.setUserId((long)i);
+            user.setUserId((long) i);
             user.setRole((Role) Role.values()[random.nextInt(Role.values().length)]);
-            user.setActivated(i%2==0);
-            user.setFirstName("Name"+i);
-            user.setLastName("LName"+i);
-            user.setPrimaryEmail("email"+i+"@gamil.com");
-            user.setLtiUserId("LTIUSID"+i);
-            user.setTermsOfServiceAccepted(i%2==0);
+            user.setActivated(i % 2 == 0);
+            user.setFirstName("Name" + i);
+            user.setLastName("LName" + i);
+            user.setPrimaryEmail("email" + i + "@gamil.com");
+            user.setLtiUserId("LTIUSID" + i);
+            user.setTermsOfServiceAccepted(i % 2 == 0);
             user.setCreatedDate(new Date());
             user.setUpdatedDate(new Date());
             users.add(user);
@@ -47,7 +47,7 @@ public class UserBuilder {
         return users;
     }
 
-    public static UserDto getUserDto(){
+    public static UserDto getUserDto() {
         UserDto userDto = new UserDto();
         userDto.setLtiUserId("LTI1");
         userDto.setFirstName("Test");
@@ -56,10 +56,10 @@ public class UserBuilder {
         userDto.setActivated(true);
         userDto.setTermsOfServiceAccepted(true);
         userDto.setRole(Role.AUTHOR);
-        return  userDto;
+        return userDto;
     }
 
-    public static User getUserFromDto(UserDto userDto){
+    public static User getUserFromDto(UserDto userDto) {
         User user = new User();
         user.setUserId(1L);
         user.setLtiUserId(userDto.getLtiUserId());
@@ -74,13 +74,13 @@ public class UserBuilder {
         return user;
     }
 
-    public static List<User> getActiveUser(boolean bool){
+    public static List<User> getActiveUser(boolean bool) {
         List<User> users = buildUserList().stream()
                 .filter(p -> p.isActivated() == bool).collect(Collectors.toList());
         return users;
     }
 
-    public static List<User> getRoleUser(Role role){
+    public static List<User> getRoleUser(Role role) {
         List<User> users = buildUserList().stream()
                 .filter(p -> p.getRole() == role).collect(Collectors.toList());
         return users;

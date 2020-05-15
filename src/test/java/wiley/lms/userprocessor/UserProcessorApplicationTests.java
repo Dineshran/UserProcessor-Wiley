@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 public class UserProcessorApplicationTests {
 
     @Test
-    public void testContext(){}
+    public void testContext() {
+    }
 
 }
