@@ -3,10 +3,9 @@ package wiley.lms.userprocessor.util;
 import org.apache.commons.validator.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wiley.lms.userprocessor.model.exception.InvalidEmailException;
 import wiley.lms.userprocessor.model.entity.Role;
+import wiley.lms.userprocessor.model.exception.InvalidEmailException;
 import wiley.lms.userprocessor.model.exception.InvalidParametersException;
-import wiley.lms.userprocessor.service.UserServiceImpl;
 
 public class Validator {
 
