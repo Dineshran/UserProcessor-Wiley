@@ -14,7 +14,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 public class UserProcessorSwaggerConfig {
 
     @Bean
-    public Docket productApi() {
+    public Docket userProcessorApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("wiley.lms.userprocessor.controller"))
