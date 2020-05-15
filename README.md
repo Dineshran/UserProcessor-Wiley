@@ -4,9 +4,9 @@ to start the project successfully follow this steps
   1. install mysql
   2. setup your username and password in application.yml file
   3. change ddl auto generate to create in application.yml file
-  4. install maven if u wish to run on cmd line
+  4. install maven if u wish to run on cmd line (optional you can yous maven wrapper)
 start mysql server 
-run application in console by executing mvn install cmd
+run application in console by executing mvn install / mvnw install  in cmd where the pom.xml exists
 in IDE you can just run UserProcesserApplication.java file
 for API infor mation goto url 
 http://{your-IPaddress}:8080/swagger-ui.html
